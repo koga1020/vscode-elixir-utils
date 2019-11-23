@@ -7,7 +7,6 @@ import * as mkdirp from 'mkdirp';
 import * as moduleParser from './moduleParser';
 import * as codeGenerator from './codeGenerator';
 import { ElixirModule } from './ElixirModule';
-import { stringify } from 'querystring';
 
 export function activate(context: vscode.ExtensionContext) {
 	let createTestFileCmd = vscode.commands.registerCommand('extension.createTestFile', () => {
@@ -21,7 +20,6 @@ export function activate(context: vscode.ExtensionContext) {
 			});
 
 		}
-
 
 	});
 	context.subscriptions.push(createTestFileCmd);
