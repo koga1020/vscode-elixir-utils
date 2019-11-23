@@ -16,7 +16,6 @@
 		"Programming Languages"
 	],
 	"activationEvents": [
-		"onLanguage:elixir",
 		"onCommand:extension.createTestFile"
 	],
 	"main": "./out/extension.js",
