@@ -47,13 +47,15 @@ async function selectTestHelper(support_dir: string, support_files: string[]) {
 
 async function writeTestCodeFile(document: vscode.TextDocument) {
 	const support_dir: string = document.uri.path.split("/lib/")[0].concat("/test/support");
-	let testHelperName: string;
-	const support_files = fs.readdirSync(support_dir);
 
-	if (support_files.length > 0) {
-		testHelperName = await selectTestHelper(support_dir, support_files);
-	} else {
-		testHelperName = "ExUnit.Case";
+	let testHelperName: string;
+	testHelperName = "ExUnit.Case";
+
+	if (fs.existsSync(support_dir)) {
+		const support_files = fs.readdirSync(support_dir);
+		if (support_files.length > 0) {
+			testHelperName = await selectTestHelper(support_dir, support_files);
+		}
 	}
 
 	const filePath = document.uri.path;
@@ -62,7 +64,7 @@ async function writeTestCodeFile(document: vscode.TextDocument) {
 		.replace('/lib/', '/test/')
 		.replace('.ex', '_test.exs');
 
-	mkdirp(path.dirname(testFilePath), (err, made) => {});
+	mkdirp(path.dirname(testFilePath), (err, made) => { });
 
 	const elixirModule: ElixirModule = moduleParser.parse(body);
 
