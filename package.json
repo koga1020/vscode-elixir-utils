@@ -1,15 +1,22 @@
 {
 	"name": "elixir-utils",
-	"displayName": "elixir-utils",
+	"displayName": "Add support command for Elixir development",
 	"description": "",
 	"version": "0.0.1",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/koga1020/vscode-elixir-utils.git"
+	},	
+	"publisher": "koga1020",
+	"license": "MIT",
 	"categories": [
-		"Other"
+		"Programming Languages"
 	],
 	"activationEvents": [
+		"onLanguage:elixir",
 		"onCommand:extension.createTestFile"
 	],
 	"main": "./out/extension.js",
@@ -33,6 +40,7 @@
 		"@types/mocha": "^5.2.7",
 		"@types/node": "^12.11.7",
 		"@types/vscode": "^1.40.0",
+		"@types/mkdirp": "^0.5.2",
 		"glob": "^7.1.5",
 		"mocha": "^6.2.2",
 		"typescript": "^3.6.4",
