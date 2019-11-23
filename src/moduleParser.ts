@@ -1,13 +1,22 @@
 import { ElixirModule } from './ElixirModule';
 
 function getFunctions(body: string) {
-
 	let functionMatch: RegExpMatchArray | null;
 
 	functionMatch = body.match(/def .*\([^\)]*\)\s*do/g);
 
 	if (functionMatch) {
-		return functionMatch.map(defStatement => defStatement.match(/def (.*)\(/)[1])
+		return functionMatch.map(defStatement => {
+			let match = defStatement.match(/def (.*)\(/);
+			if (match) {
+				let functionName: string = match[1];
+				return functionName;
+			} else {
+				return "";
+			}
+		})
+		.filter(functionName => functionName !== "");
+		
 	} else {
 		return [];
 	}
@@ -19,17 +28,18 @@ function getModuleName(body: string) {
 	match = body.match(/defmodule (.*) do/);
 
 	if (match) {
-		return match[1];
+		let moduleName: string = match[1];
+		return moduleName;
 	} else {
-		return null;
+		return "";
 	}
 
 }
 
 export function parse(body: string) {
 
-	let moduleName: string | null;
-	let functions: string[] | null;
+	let moduleName: string;
+	let functions: string[];
 
 	moduleName = getModuleName(body);
 	functions = getFunctions(body);

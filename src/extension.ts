@@ -21,18 +21,22 @@ export function activate(context: vscode.ExtensionContext) {
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('extension.createTestFile', () => {
-		const document = vscode.window.activeTextEditor.document;
 
-		writeTestCodeFile(document).then(dest => {
-			vscode.workspace.openTextDocument(dest).then(testFile => {
-				vscode.window.showTextDocument(testFile);
+		if (vscode.window.activeTextEditor !== undefined) {
+			const document = vscode.window.activeTextEditor.document;
+			writeTestCodeFile(document).then(dest => {
+				vscode.workspace.openTextDocument(dest).then(testFile => {
+					vscode.window.showTextDocument(testFile);
+				});
 			});
-		});
 
-		context.subscriptions.push(disposable);
+			context.subscriptions.push(disposable);
+		}
+
+
 	});
 
-});
+}
 
 
 // this method is called when your extension is deactivated
@@ -42,10 +46,15 @@ async function selectTestHelper(support_dir: string, support_files: string[]) {
 	const options: vscode.QuickPickOptions = { placeHolder: "Select test helper module" };
 
 	return await vscode.window.showQuickPick(support_files, options).then((selected) => {
-		const testHelperFileContent = fs.readFileSync(path.join(support_dir, selected), 'utf8');
-		const testHelperModule: ElixirModule = moduleParser.parse(testHelperFileContent);
+		if (selected != undefined) {
+			const testHelperFileContent = fs.readFileSync(path.join(support_dir, selected), 'utf8');
+			const testHelperModule: ElixirModule = moduleParser.parse(testHelperFileContent);
 
-		return testHelperModule.name;
+			return testHelperModule.name;
+		} else {
+			return "ExUnit.Case";
+		}
+
 	});
 
 }
@@ -67,7 +76,7 @@ async function writeTestCodeFile(document: vscode.TextDocument) {
 		.replace('/lib/', '/test/')
 		.replace('.ex', '_test.exs');
 
-	mkdirp(path.dirname(testFilePath));
+	mkdirp(path.dirname(testFilePath), (err, made) => {});
 
 	const elixirModule: ElixirModule = moduleParser.parse(body);
 
