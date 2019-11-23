@@ -2,7 +2,7 @@
 	"name": "elixir-utils",
 	"displayName": "Elixir Utils",
 	"description": "Add support command for Elixir development",
-	"version": "0.0.2",
+	"version": "0.0.3",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
