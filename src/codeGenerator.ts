@@ -1,6 +1,6 @@
 import { ElixirModule } from './ElixirModule';
 
-export function generateTestCode(elixirModule: ElixirModule) {
+export function generateTestCode(elixirModule: ElixirModule, testHelperName: string) {
     let testModuleName: string;
     let testCodeBody: string;
 
@@ -9,5 +9,5 @@ export function generateTestCode(elixirModule: ElixirModule) {
         return `  describe "${functionName}" do\n  end`;
     }).join("\n\n");
 
-    return `defmodule ${testModuleName} do\n${testCodeBody}\nend\n`;
+    return `defmodule ${testModuleName} do\n  use ${testHelperName}\n\n${testCodeBody}\nend\n`;
 }

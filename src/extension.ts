@@ -7,6 +7,7 @@ import * as mkdirp from 'mkdirp';
 import * as moduleParser from './moduleParser';
 import * as codeGenerator from './codeGenerator';
 import { ElixirModule } from './ElixirModule';
+import { stringify } from 'querystring';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -22,26 +23,58 @@ export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('extension.createTestFile', () => {
 		const document = vscode.window.activeTextEditor.document;
 
-		writeTestCodeFile(document);
+		writeTestCodeFile(document).then(dest => {
+			vscode.workspace.openTextDocument(dest).then(testFile => {
+				vscode.window.showTextDocument(testFile);
+			});
+		});
+
+		context.subscriptions.push(disposable);
 	});
 
-	context.subscriptions.push(disposable);
-}
+});
+
 
 // this method is called when your extension is deactivated
 export function deactivate() { }
 
-function writeTestCodeFile(document: vscode.TextDocument) {
+async function selectTestHelper(support_dir: string, support_files: string[]) {
+	const options: vscode.QuickPickOptions = { placeHolder: "Select test helper module" };
+
+	return await vscode.window.showQuickPick(support_files, options).then((selected) => {
+		const testHelperFileContent = fs.readFileSync(path.join(support_dir, selected), 'utf8');
+		const testHelperModule: ElixirModule = moduleParser.parse(testHelperFileContent);
+
+		return testHelperModule.name;
+	});
+
+}
+
+async function writeTestCodeFile(document: vscode.TextDocument) {
+	const support_dir: string = document.uri.path.split("/lib/")[0].concat("/test/support");
+	let testHelperName: string;
+	const support_files = fs.readdirSync(support_dir);
+
+	if (support_files.length > 0) {
+		testHelperName = await selectTestHelper(support_dir, support_files);
+	} else {
+		testHelperName = "ExUnit.Case";
+	}
+
 	const filePath = document.uri.path;
 	const body = document.getText();
 	const testFilePath = filePath
 		.replace('/lib/', '/test/')
-		.replace('.ex', '_test.ex');
+		.replace('.ex', '_test.exs');
 
 	mkdirp(path.dirname(testFilePath));
 
 	const elixirModule: ElixirModule = moduleParser.parse(body);
-	fs.writeFileSync(testFilePath, codeGenerator.generateTestCode(elixirModule), 'utf8');
+
+	fs.writeFileSync(testFilePath, codeGenerator.generateTestCode(elixirModule, testHelperName), 'utf8');
 
 	vscode.window.showInformationMessage(`create ${testFilePath}.`);
+
+	return testFilePath;
+
 }
