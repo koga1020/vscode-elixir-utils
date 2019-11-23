@@ -1,9 +1,7 @@
-# elixir-utils README
+# elixir-utils
 
 Add support command for Elixir development.
 
-
 ## Features
-
 
 - createTestFile
