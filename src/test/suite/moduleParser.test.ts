@@ -21,6 +21,6 @@ suite("moduleParser Test Suite", () => {
     const result: ElixirModule = moduleParser.parse(elixirModuleContent);
 
     assert.equal("Sample", result.name);
-    assert.deepEqual(["a", "b", "c"], result.functions);
+    assert.deepEqual(result.functions, ["a", "b", "c"]);
   });
 });
