@@ -27,24 +27,15 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  let setupPhoenixDepsCommand = vscode.commands.registerCommand(
-    "extension.setupPhoenixDeps",
-    () => {
-      const workspaceFolders = vscode.workspace.workspaceFolders;
-
-      if (workspaceFolders !== undefined && workspaceFolders.length > 0) {
-        updateDeps(workspaceFolders[0]);
-      }
-    }
-  );
-
-  let setupPhoenixDockerCommand = vscode.commands.registerCommand(
-    "extension.setupPhoenixDocker",
+  let setupPhoenixProjectCommand = vscode.commands.registerCommand(
+    "extension.setupPhoenixProject",
     () => {
       const workspaceFolders = vscode.workspace.workspaceFolders;
 
       if (workspaceFolders !== undefined && workspaceFolders.length > 0) {
         const workspaceFolder = workspaceFolders[0];
+        updateDeps(workspaceFolder);
+        addWorkflowTemplate(workspaceFolder);
 
         // TODO: use user choice.
         generateDockerFiles("PostgreSQL", workspaceFolder);
@@ -56,8 +47,19 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
   context.subscriptions.push(createTestFileCmd);
-  context.subscriptions.push(setupPhoenixDepsCommand);
-  context.subscriptions.push(setupPhoenixDockerCommand);
+  context.subscriptions.push(setupPhoenixProjectCommand);
+}
+
+export function addWorkflowTemplate(workspaceFolder: vscode.WorkspaceFolder) {
+  const workflowDir = path.join(workspaceFolder.uri.path, ".github/workflows");
+  mkdirp(workflowDir, (err, made) => {
+    console.log(err);
+  });
+
+  fileUtil.writeFile(
+    path.join(workflowDir, "test.yml"),
+    phoenixTemplates.githubActionYmlContent()
+  );
 }
 
 export function generateDockerFiles(
@@ -104,7 +106,9 @@ export async function updateGitIgnore(workspaceFolder: vscode.WorkspaceFolder) {
   const ignoreFilePath = path.join(workspaceFolder.uri.path, ".gitignore");
   const ignoreFileContent = await fileUtil.readFile(ignoreFilePath);
 
-  const updateIgnoreFileContent = ignoreFileContent.concat("\n.elixir_ls/\ndockerfiles/db/");
+  const updateIgnoreFileContent = ignoreFileContent.concat(
+    "\n.elixir_ls/\ndockerfiles/db/"
+  );
 
   fileUtil.writeFile(ignoreFilePath, updateIgnoreFileContent);
 }
