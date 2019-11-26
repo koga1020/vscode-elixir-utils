@@ -52,3 +52,39 @@ export function envrcContent(): string {
     "export POSTGRES_PASSWORD=secret"
   ].join("\n");
 }
+
+export function githubActionYmlContent() {
+  return [
+    "name: Elixir CI",
+    "",
+    "on: push",
+    "",
+    "jobs:",
+    "  build:",
+    "    runs-on: ubuntu-latest",
+    "",
+    "    container:",
+    "      image: elixir:1.9.1-slim",
+    "",
+    "    steps:",
+    "      - uses: actions/checkout@v1",
+    "      - name: Cache deps",
+    "        uses: actions/cache@v1",
+    "        id: cache-deps",
+    "        with:",
+    "          path: deps",
+    "          key: ${{ runner.os }}-mix-${{ hashFiles(format('{0}{1}', github.workspace, '/mix.lock')) }}",
+    "          restore-keys: |",
+    "            ${{ runner.os }}-mix-",
+    "      - name: Install hex",
+    "        run: |",
+    "          mix local.rebar --force",
+    "          mix local.hex --force",
+    "      - name: Install Dependencies",
+    "        if: steps.cache-deps.outputs.cache-hit != 'true'",
+    "        run: |",
+    "          mix deps.get",
+    "      - name: Run Tests",
+    "        run: mix test"
+  ].join("\n");
+}

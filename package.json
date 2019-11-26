@@ -1,63 +1,58 @@
 {
-	"name": "elixir-utils",
-	"displayName": "Elixir Utils",
-	"description": "Add support command for Elixir development",
-	"version": "0.0.13",
-	"engines": {
-		"vscode": "^1.40.0"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/koga1020/vscode-elixir-utils.git"
-	},
-	"publisher": "koga1020",
-	"license": "MIT",
-	"categories": [
-		"Programming Languages"
-	],
-	"activationEvents": [
-		"onLanguage:elixir",
-		"onCommand:extension.createTestFile",
-		"onCommand:extension.setupPhoenixDeps",
-		"onCommand:extension.setupPhoenixDocker"
-	],
-	"main": "./out/extension.js",
-	"contributes": {
-		"commands": [
-			{
-				"command": "extension.createTestFile",
-				"title": "Elixir Utils: create test file"
-			},
-			{
-				"command": "extension.setupPhoenixDeps",
-				"title": "Elixir Utils: setup Phoenix deps"
-			},
-			{
-				"command": "extension.setupPhoenixDocker",
-				"title": "Elixir Utils: setup Phoenix DockerFiles"
-			}
-		]
-	},
-	"scripts": {
-		"vscode:prepublish": "npm run compile",
-		"compile": "tsc -p ./",
-		"watch": "tsc -watch -p ./",
-		"pretest": "npm run compile",
-		"test": "node ./out/test/runTest.js"
-	},
-	"devDependencies": {
-		"@types/glob": "^7.1.1",
-		"@types/mkdirp": "^0.5.2",
-		"@types/mocha": "^5.2.7",
-		"@types/node": "^12.11.7",
-		"@types/vscode": "^1.40.0",
-		"glob": "^7.1.5",
-		"mocha": "^6.2.2",
-		"tslint": "^5.20.0",
-		"typescript": "^3.6.4",
-		"vscode-test": "^1.2.2"
-	},
-	"dependencies": {
-		"mkdirp": "^0.5.1"
-	}
+  "name": "elixir-utils",
+  "displayName": "Elixir Utils",
+  "description": "Add support command for Elixir development",
+  "version": "0.0.13",
+  "engines": {
+    "vscode": "^1.40.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/koga1020/vscode-elixir-utils.git"
+  },
+  "publisher": "koga1020",
+  "license": "MIT",
+  "categories": [
+    "Programming Languages"
+  ],
+  "activationEvents": [
+    "onLanguage:elixir",
+    "onCommand:extension.createTestFile",
+    "onCommand:extension.setupPhoenixProject"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.createTestFile",
+        "title": "Elixir Utils: create test file"
+      },
+      {
+        "command": "extension.setupPhoenixProject",
+        "title": "Elixir Utils: setup Phoenix Project"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/glob": "^7.1.1",
+    "@types/mkdirp": "^0.5.2",
+    "@types/mocha": "^5.2.7",
+    "@types/node": "^12.11.7",
+    "@types/vscode": "^1.40.0",
+    "glob": "^7.1.5",
+    "mocha": "^6.2.2",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.4",
+    "vscode-test": "^1.2.2"
+  },
+  "dependencies": {
+    "mkdirp": "^0.5.1"
+  }
 }
