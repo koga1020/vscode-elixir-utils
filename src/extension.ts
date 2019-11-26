@@ -107,7 +107,7 @@ export async function updateGitIgnore(workspaceFolder: vscode.WorkspaceFolder) {
   const ignoreFileContent = await fileUtil.readFile(ignoreFilePath);
 
   const updateIgnoreFileContent = ignoreFileContent.concat(
-    "\n.elixir_ls/\ndockerfiles/db/"
+    "\n.elixir_ls/\ndockerfiles/db/data"
   );
 
   fileUtil.writeFile(ignoreFilePath, updateIgnoreFileContent);
