@@ -2,7 +2,7 @@
 	"name": "elixir-utils",
 	"displayName": "Elixir Utils",
 	"description": "Add support command for Elixir development",
-	"version": "0.0.10",
+	"version": "0.0.11",
 	"engines": {
 		"vscode": "^1.40.0"
 	},
@@ -17,7 +17,9 @@
 	],
 	"activationEvents": [
 		"onLanguage:elixir",
-		"onCommand:extension.createTestFile"
+		"onCommand:extension.createTestFile",
+		"onCommand:extension.setupPhoenixDeps",
+		"onCommand:extension.setupPhoenixDocker"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -25,6 +27,14 @@
 			{
 				"command": "extension.createTestFile",
 				"title": "Elixir Utils: create test file"
+			},
+			{
+				"command": "extension.setupPhoenixDeps",
+				"title": "Elixir Utils: setup Phoenix deps"
+			},
+			{
+				"command": "extension.setupPhoenixDocker",
+				"title": "Elixir Utils: setup Phoenix DockerFiles"
 			}
 		]
 	},
