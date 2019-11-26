@@ -18,7 +18,8 @@
 	"activationEvents": [
 		"onLanguage:elixir",
 		"onCommand:extension.createTestFile",
-		"onCommand:extension.setupPhoenixDeps"
+		"onCommand:extension.setupPhoenixDeps",
+		"onCommand:extension.setupPhoenixDocker"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
@@ -30,6 +31,10 @@
 			{
 				"command": "extension.setupPhoenixDeps",
 				"title": "Elixir Utils: setup Phoenix deps"
+			},
+			{
+				"command": "extension.setupPhoenixDocker",
+				"title": "Elixir Utils: setup Phoenix DockerFiles"
 			}
 		]
 	},

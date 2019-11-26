@@ -6,6 +6,8 @@ import * as path from "path";
 import * as mkdirp from "mkdirp";
 import * as moduleParser from "./moduleParser";
 import * as codeGenerator from "./codeGenerator";
+import * as phoenixTemplates from "./templates/phoenixTemplates";
+import * as fileUtil from "./fileUtil";
 import { ElixirModule } from "./ElixirModule";
 
 const defaultTestHelperModuleName: string = "ExUnit.Case";
@@ -35,8 +37,95 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }
   );
+
+  let setupPhoenixDockerCommand = vscode.commands.registerCommand(
+    "extension.setupPhoenixDocker",
+    () => {
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+
+      if (workspaceFolders !== undefined && workspaceFolders.length > 0) {
+        const workspaceFolder = workspaceFolders[0];
+
+        // TODO: use user choice.
+        generateDockerFiles("PostgreSQL", workspaceFolder);
+        generateDockerCompose(workspaceFolder);
+        generateEnvrc(workspaceFolder);
+        updateDevConfig(workspaceFolder);
+        updateGitIgnore(workspaceFolder);
+      }
+    }
+  );
   context.subscriptions.push(createTestFileCmd);
   context.subscriptions.push(setupPhoenixDepsCommand);
+  context.subscriptions.push(setupPhoenixDockerCommand);
+}
+
+export function generateDockerFiles(
+  db: string,
+  workspaceFolder: vscode.WorkspaceFolder
+) {
+  const dbDockerfileDir = path.join(
+    workspaceFolder.uri.path,
+    "dockerfiles",
+    "db"
+  );
+
+  mkdirp(dbDockerfileDir, (err, made) => {});
+
+  fileUtil.writeFile(
+    path.join(dbDockerfileDir, "Dockerfile"),
+    dbDockerFileContent(db)
+  );
+}
+
+export function generateDockerCompose(workspaceFolder: vscode.WorkspaceFolder) {
+  fileUtil.writeFile(
+    path.join(workspaceFolder.uri.path, "docker-compose.yml"),
+    phoenixTemplates.dockerComposeFileContent()
+  );
+}
+
+export function generateEnvrc(workspaceFolder: vscode.WorkspaceFolder) {
+  fileUtil.writeFile(
+    path.join(workspaceFolder.uri.path, ".envrc.example"),
+    phoenixTemplates.envrcContent()
+  );
+}
+
+export function dbDockerFileContent(db: string) {
+  if (db === "PostgreSQL") {
+    return phoenixTemplates.postgresqlDockerFileContent();
+  } else {
+    return "";
+  }
+}
+
+export async function updateGitIgnore(workspaceFolder: vscode.WorkspaceFolder) {
+  const ignoreFilePath = path.join(workspaceFolder.uri.path, ".gitignore");
+  const ignoreFileContent = await fileUtil.readFile(ignoreFilePath);
+
+  const updateIgnoreFileContent = ignoreFileContent.concat("\ndockerfiles/db/");
+
+  fileUtil.writeFile(ignoreFilePath, updateIgnoreFileContent);
+}
+
+export async function updateDevConfig(workspaceFolder: vscode.WorkspaceFolder) {
+  const devConfigFile = path.join(workspaceFolder.uri.path, "config/dev.exs");
+
+  const content = await fileUtil.readFile(devConfigFile);
+
+  const updateContent = content
+    .replace(/username: .*/, 'username: System.fetch_env!("POSTGRES_USER"),')
+    .replace(
+      /password: .*/,
+      'password: System.fetch_env!("POSTGRES_PASSWORD"),'
+    )
+    .replace(
+      /database: .*/,
+      'database: System.fetch_env!("POSTGRES_DB"),\n  port: String.to_integer(System.fetch_env!("POSTGRES_PORT")),'
+    );
+
+  fileUtil.writeFile(devConfigFile, updateContent);
 }
 
 export async function updateDeps(workspaceFolder: vscode.WorkspaceFolder) {
@@ -46,13 +135,7 @@ export async function updateDeps(workspaceFolder: vscode.WorkspaceFolder) {
     vscode.Uri.file(mixPath)
   );
 
-  const appendDeps = [
-    '{:credo, "~> 1.1.0", only: [:dev, :test], runtime: false}',
-    '{:mix_test_watch, "~> 0.8", only: :dev, runtime: false}',
-    '{:ex_machina, "~> 2.3", only: :test}'
-  ]
-    .join(",\n      ")
-    .concat(",\n      ");
+  const appendDeps = phoenixTemplates.appendDepsString();
 
   const updateMixFileContent = mixFileContent
     .toString()
@@ -61,10 +144,7 @@ export async function updateDeps(workspaceFolder: vscode.WorkspaceFolder) {
       `defp deps do\n    \[\n      ${appendDeps}`
     );
 
-  await vscode.workspace.fs.writeFile(
-    vscode.Uri.file(mixPath),
-    Buffer.from(updateMixFileContent)
-  );
+  fileUtil.writeFile(mixPath, updateMixFileContent);
 }
 
 // this method is called when your extension is deactivated
