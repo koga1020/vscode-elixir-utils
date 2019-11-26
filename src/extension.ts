@@ -24,7 +24,47 @@ export function activate(context: vscode.ExtensionContext) {
       }
     }
   );
+
+  let setupPhoenixDepsCommand = vscode.commands.registerCommand(
+    "extension.setupPhoenixDeps",
+    () => {
+      const workspaceFolders = vscode.workspace.workspaceFolders;
+
+      if (workspaceFolders !== undefined && workspaceFolders.length > 0) {
+        updateDeps(workspaceFolders[0]);
+      }
+    }
+  );
   context.subscriptions.push(createTestFileCmd);
+  context.subscriptions.push(setupPhoenixDepsCommand);
+}
+
+export async function updateDeps(workspaceFolder: vscode.WorkspaceFolder) {
+  const mixPath = path.join(workspaceFolder.uri.path, "mix.exs");
+
+  const mixFileContent = await vscode.workspace.fs.readFile(
+    vscode.Uri.file(mixPath)
+  );
+
+  const appendDeps = [
+    '{:credo, "~> 1.1.0", only: [:dev, :test], runtime: false}',
+    '{:mix_test_watch, "~> 0.8", only: :dev, runtime: false}',
+    '{:ex_machina, "~> 2.3", only: :test}'
+  ]
+    .join(",\n      ")
+    .concat(",\n      ");
+
+  const updateMixFileContent = mixFileContent
+    .toString()
+    .replace(
+      /defp deps do\n    \[\n      /,
+      `defp deps do\n    \[\n      ${appendDeps}`
+    );
+
+  await vscode.workspace.fs.writeFile(
+    vscode.Uri.file(mixPath),
+    Buffer.from(updateMixFileContent)
+  );
 }
 
 // this method is called when your extension is deactivated
