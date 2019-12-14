@@ -42,14 +42,14 @@ export function appendDepsString(): string {
     .join(",\n      ")
     .concat(",\n      ");
 }
-export function envrcContent(): string {
+export function dotEnvContent(): string {
   return [
     "# postgres",
-    "export DATA_PATH_HOST=./dockerfiles/db/data/",
-    "export POSTGRES_PORT=5432",
-    "export POSTGRES_DB=default",
-    "export POSTGRES_USER=default",
-    "export POSTGRES_PASSWORD=secret"
+    "DATA_PATH_HOST=./dockerfiles/db/data/",
+    "POSTGRES_PORT=5432",
+    "POSTGRES_DB=default",
+    "POSTGRES_USER=default",
+    "POSTGRES_PASSWORD=secret"
   ].join("\n");
 }
 

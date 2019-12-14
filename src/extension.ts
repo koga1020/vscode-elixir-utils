@@ -89,8 +89,12 @@ export function generateDockerCompose(workspaceFolder: vscode.WorkspaceFolder) {
 
 export function generateEnvrc(workspaceFolder: vscode.WorkspaceFolder) {
   fileUtil.writeFile(
+    path.join(workspaceFolder.uri.path, ".env.example"),
+    phoenixTemplates.dotEnvContent()
+  );
+  fileUtil.writeFile(
     path.join(workspaceFolder.uri.path, ".envrc.example"),
-    phoenixTemplates.envrcContent()
+    "dotenv"
   );
 }
 
